@@ -64,6 +64,8 @@ class MyCanvas(QtOpenGL.QGLWidget):
                     for i in range(3):
                         glVertex2d(triangs[j][i].getX(), triangs[j][i].getY())
                     glEnd()
+
+            # Desenhar curvas
             segments = self.m_hmodel.getSegments()
             for curv in segments:
                 ptc = curv.getPointsToDraw()
@@ -72,6 +74,20 @@ class MyCanvas(QtOpenGL.QGLWidget):
                 for i in range(2):
                     glVertex2f(ptc[i].getX(), ptc[i].getY())
                 # glVertex2f(ptc[1].getX(), ptc[1].getY())
+                glEnd()
+            
+            # Desenhar curvas de Bezier Quadráticas
+            quadratic_beziers = self.m_hmodel.getQuadraticBeziers()
+            for bezier in quadratic_beziers:
+                p0_U = self.convertPtCoordsToUniverse(bezier.getP0())
+                p1_U = self.convertPtCoordsToUniverse(bezier.getP1())
+                p2_U = self.convertPtCoordsToUniverse(bezier.getP2())
+                glColor(1.0, 0.0, 1.0)  # magenta
+                glBegin(GL_LINES)
+                glVertex2d(p0_U.x(), p0_U.y())
+                glVertex2d(p1_U.x(), p1_U.y())
+                glVertex2d(p1_U.x(), p1_U.y())
+                glVertex2d(p2_U.x(), p2_U.y())
                 glEnd()
 
     def setModel(self, _model):
@@ -139,18 +155,27 @@ class MyCanvas(QtOpenGL.QGLWidget):
         pt0_U = self.convertPtCoordsToUniverse(self.m_pt0)
         pt1_U = self.convertPtCoordsToUniverse(self.m_pt1)
 
+        # Adicionar curva
+        self.m_model.setCurve(pt0_U.x(), pt0_U.y(), pt1_U.x(), pt1_U.y())
+
+        # Adicionar curva de Bezier Quadrática
+        self.m_model.setQuadraticBezier(pt0_U, QtCore.QPointF(pt0_U.x() + 50, pt0_U.y() + 50), pt1_U)
+
         # self.m_model.setCurve(pt0_U.x(), pt0_U.y(), pt1_U.x(), pt1_U.y())
         # self.m_model.setCurve(self.m_pt0.x(), self.m_pt0.y(), self.m_pt1.x(), self.m_pt1.y())
+
         self.m_buttonPressed = False
         self.m_pt0.setX(0)
         self.m_pt0.setY(0)
         self.m_pt1.setX(0)
         self.m_pt1.setY(0)
 
-        p0 = Point(pt0_U.x(), pt0_U.y())
-        p1 = Point(pt1_U.x(), pt1_U.y())
-        segment = Line(p0, p1)
+        # p0 = Point(pt0_U.x(), pt0_U.y())
+        # p1 = Point(pt1_U.x(), pt1_U.y())
+        # segment = Line(p0, p1)
 
-        self.m_controller.insertSegment(segment, 0.01)
+        # self.m_controller.insertSegment(segment, 0.01)
+
+        # Atualizar o canvas
         self.update()
         self.repaint()

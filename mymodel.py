@@ -96,9 +96,12 @@ class MyModel:
                     ymax = temp_ymax
         return xmin,xmax,ymin,ymax
     
-    
-    
+    def setQuadraticBezier(self, _p0, _p1, _p2):
+        self.m_quadratic_beziers.append(MyQuadraticBezier(_p0, _p1, _p2))
 
+    def getQuadraticBeziers(self):
+        return self.m_quadratic_beziers
+    
 class MyQuadraticBezier:
     def __init__(self, _p0=None, _p1=None, _p2=None):
         self.m_p0 = _p0
