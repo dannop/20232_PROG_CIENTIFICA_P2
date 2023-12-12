@@ -8,7 +8,7 @@ class MyWindow(QMainWindow):
   def __init__(self):
     super(MyWindow, self).__init__()
     self.setGeometry(100, 100, 600, 400)
-    self.setWindowTitle("Trabalho P2 - Programação Científica")
+    self.setWindowTitle("Trabalho P2 - Programação Científica - Daniel Lessa")
     self.canvas = MyCanvas()
     self.setCentralWidget(self.canvas)
     # create a model object and pass to canvas

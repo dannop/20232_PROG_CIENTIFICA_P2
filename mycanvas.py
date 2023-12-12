@@ -171,13 +171,24 @@ class MyCanvas(QtOpenGL.QGLWidget):
                     posx = xmin + self.space*i
                     posy = ymin + self.space*j
                     point = Point(posx, posy)
-                    if CompGeom.isPointInPolygon(self.m_hmodel.getPoints(), point):
-                        glColor4f(1.0, 1.0, 1.0, 1.0)
-                        glPointSize(4)
-                        glBegin(GL_POINTS)
-                        glVertex2f(point.getX(), point.getY())
-                        glEnd()
-                        json_data["points"].append([point.getX(), point.getY()])
+                    patches = self.m_hmodel.getPatches()
+                    
+                    for pacth in patches:
+                        if CompGeom.isPointInPolygon(pacth.getPoints(), point):
+                            glColor4f(1.0, 1.0, 1.0, 1.0)
+                            glPointSize(4)
+                            glBegin(GL_POINTS)
+                            glVertex2f(point.getX(), point.getY())
+                            glEnd()
+                            json_data["points"].append([point.getX(), point.getY()])
+
+                    # if CompGeom.isPointInPolygon(self.m_hmodel.getPoints(), point):
+                    #     glColor4f(1.0, 1.0, 1.0, 1.0)
+                    #     glPointSize(4)
+                    #     glBegin(GL_POINTS)
+                    #     glVertex2f(point.getX(), point.getY())
+                    #     glEnd()
+                    #     json_data["points"].append([point.getX(), point.getY()])
             glEndList()
 
             json_object = json.dumps(json_data)
