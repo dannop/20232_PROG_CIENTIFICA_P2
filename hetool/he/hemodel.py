@@ -1,7 +1,7 @@
 from hetool.compgeom.compgeom import CompGeom
 from hetool.geometry.point import Point
 from hetool.geometry.segments.polyline import Polyline
-
+import math
 
 class HeModel:
 
@@ -122,6 +122,249 @@ class HeModel:
                 selectedFaces.append(face)
 
         return selectedFaces
+
+    def getBoundBox(self):
+
+        if self.isEmpty():
+            return 0.0, 10.0, 0.0, 10.0
+
+        points = self.points
+        x = points[0].getX()
+        y = points[0].getY()
+
+        xmin = x
+        ymin = y
+        xmax = x
+        ymax = y
+
+        for i in range(1, len(points)):
+            x = points[i].getX()
+            y = points[i].getY()
+            xmin = min(x, xmin)
+            xmax = max(x, xmax)
+            ymin = min(y, ymin)
+            ymax = max(y, ymax)
+
+        for segment in self.segments:
+            xmin_c, xmax_c, ymin_c, ymax_c = segment.getBoundBox()
+            xmin = min(xmin_c, xmin)
+            xmax = max(xmax_c, xmax)
+            ymin = min(ymin_c, ymin)
+            ymax = max(ymax_c, ymax)
+
+        return xmin, xmax, ymin, ymax
+
+    def selectPick(self, _x,  _y,  _tol,  _shiftkey):
+
+        if self.isEmpty():
+            return
+
+        # select point
+        ispointSelected = False
+        id_target = -1
+        dmin = _tol
+        if self.select_point:
+            for i in range(0, len(self.points)):
+                dist = Point.euclidiandistance(
+                    Point(_x, _y), self.points[i])
+                if dist < dmin:
+                    dmin = dist
+                    id_target = i
+
+            # Revert selection of picked point
+            if id_target > -1:
+                ispointSelected = True
+                if self.points[id_target].isSelected():
+                    self.points[id_target].setSelected(False)
+                else:
+                    self.points[id_target].setSelected(True)
+
+        if not _shiftkey:
+            # If shift key is not pressed, unselect all points except
+            # the picked one (if there was one selected)
+            for i in range(0, len(self.points)):
+                if i != id_target:
+                    self.points[i].setSelected(False)
+
+        # select segment
+        issegmentselected = False
+        id_target = -1
+        dmin = _tol
+        if self.select_segment and not ispointSelected:
+            for i in range(0, len(self.segments)):
+                # Compute distance between given point and segment and
+                # update minimum distance
+                xC, yC, d = self.segments[i].closestPoint(_x, _y)
+                if d < dmin:
+                    dmin = d
+                    id_target = i
+
+            # Revert selection of picked segment
+            if id_target > -1:
+                issegmentselected = True
+                if self.segments[id_target].isSelected():
+                    self.segments[id_target].setSelected(False)
+                else:
+                    self.segments[id_target].setSelected(True)
+
+        if not _shiftkey:
+            # If shift key is not pressed, unselect all segments except
+            # the picked one (if there was one selected)
+            for i in range(0, len(self.segments)):
+                if i != id_target:
+                    self.segments[i].setSelected(False)
+
+        if self.select_patch and not ispointSelected and not issegmentselected:
+            # Check whether point is inside a patch
+            p = Point(_x, _y)
+            for i in range(0, len(self.patches)):
+                if not self.patches[i].isDeleted:
+                    if self.patches[i].isPointInside(p):
+                        if self.patches[i].isSelected():
+                            self.patches[i].setSelected(False)
+                        else:
+                            self.patches[i].setSelected(True)
+                    else:
+                        if not _shiftkey:
+                            self.patches[i].setSelected(False)
+        elif not _shiftkey:
+            for i in range(0, len(self.patches)):
+                self.patches[i].setSelected(False)
+
+    def selectFence(self, _xmin, _xmax, _ymin, _ymax, _shiftkey):
+
+        if self.isEmpty():
+            return
+
+        if self.select_segment:
+            # select segments
+            for i in range(0, len(self.segments)):
+                xmin_c, xmax_c, ymin_c, ymax_c = self.segments[i].getBoundBox(
+                )
+                if ((xmin_c < _xmin) or (xmax_c > _xmax) or
+                        (ymin_c < _ymin) or (ymax_c > _ymax)):
+                    inFence = False
+                else:
+                    inFence = True
+
+                if inFence:
+                    # Select segment inside fence
+                    self.segments[i].setSelected(True)
+                else:
+                    if not _shiftkey:
+                        self.segments[i].setSelected(False)
+        elif not _shiftkey:
+            for i in range(0, len(self.segments)):
+                self.segments[i].setSelected(False)
+
+        if self.select_point:
+            # select points
+            for i in range(0, len(self.points)):
+                x = self.points[i].getX()
+                y = self.points[i].getY()
+
+                if ((x < _xmin) or (x > _xmax) or
+                        (y < _ymin) or (y > _ymax)):
+                    inFence = False
+                else:
+                    inFence = True
+
+                if inFence:
+                    # Select segment inside fence
+                    self.points[i].setSelected(True)
+                else:
+                    if not _shiftkey:
+                        self.points[i].setSelected(False)
+        elif not _shiftkey:
+            for i in range(0, len(self.points)):
+                self.points[i].setSelected(False)
+
+        if self.select_patch:
+            # select patches
+            for i in range(0, len(self.patches)):
+                if not self.patches[i].isDeleted:
+                    xmin_r, xmax_r, ymin_r, ymax_r = self.patches[i].getBoundBox(
+                    )
+                    if((xmin_r < _xmin) or (xmax_r > _xmax) or
+                            (ymin_r < _ymin) or (ymax_r > _ymax)):
+                        inFence = False
+                    else:
+                        inFence = True
+
+                    if inFence:
+                        # Select patch inside fence
+                        self.patches[i].setSelected(True)
+                    else:
+                        # If shift key is not pressed, unselect patch outside fence
+                        if not _shiftkey:
+                            self.patches[i].setSelected(False)
+        elif not _shiftkey:
+            for i in range(0, len(self.patches)):
+                self.patches[i].setSelected(False)
+
+    def snapToSegment(self, _x, _y, _tol):
+
+        if self.isEmpty():
+            return False, _x, _y
+
+        xClst = _x
+        yClst = _y
+        id_target = -1
+        dmin = _tol
+
+        for i in range(0, len(self.segments)):
+            xC, yC, dist = self.segments[i].closestPoint(_x, _y)
+            if dist < dmin:
+                xClst = xC
+                yClst = yC
+                dmin = dist
+                id_target = i
+
+        if id_target < 0:
+            return False, xClst, yClst
+
+        # try to attract to a corner of the segment
+        seg_pts = self.segments[id_target].getPoints()
+
+        dmin = _tol*2
+        for pt in seg_pts:
+            pt_x = pt.getX()
+            pt_y = pt.getY()
+            d = math.sqrt((_x-pt_x)*(_x-pt_x)+(_y-pt_y)*(_y-pt_y))
+
+            if d < dmin:
+                xClst = pt_x
+                yClst = pt_y
+                dmin = d
+
+        # If found a closest point, return its coordinates
+        return True, xClst, yClst
+
+    def snapToPoint(self, _x, _y, _tol):
+        if self.isEmpty():
+            return False, _x, _y
+
+        xClst = _x
+        yClst = _y
+        id_target = -1
+        dmin = _tol
+
+        for i in range(0, len(self.points)):
+            xC = self.points[i].getX()
+            yC = self.points[i].getY()
+            if (abs(_x - xC) < _tol) and (abs(_y - yC) < _tol):
+                d = math.sqrt((_x-xC)*(_x-xC)+(_y-yC)*(_y-yC))
+                if d < dmin:
+                    xClst = xC
+                    yClst = yC
+                    dmin = d
+                    id_target = i
+
+        if id_target < 0:
+            return False, xClst, yClst
+
+        # If found a closest point, return its coordinates
+        return True, xClst, yClst
 
     def verticesCrossingWindow(self, _xmin, _xmax, _ymin, _ymax):
         vertices = []

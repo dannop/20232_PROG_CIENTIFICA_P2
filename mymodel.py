@@ -95,30 +95,3 @@ class MyModel:
                 if temp_ymax > ymax:
                     ymax = temp_ymax
         return xmin,xmax,ymin,ymax
-    
-    
-    
-
-class MyQuadraticBezier:
-    def __init__(self, _p0=None, _p1=None, _p2=None):
-        self.m_p0 = _p0
-        self.m_p1 = _p1
-        self.m_p2 = _p2
-
-    def setP0(self, _p0):
-        self.m_p0 = _p0
-
-    def setP1(self, _p1):
-        self.m_p1 = _p1
-
-    def setP2(self, _p2):
-        self.m_p2 = _p2
-
-    def getP0(self):
-        return self.m_p0
-
-    def getP1(self):
-        return self.m_p1
-
-    def getP2(self):
-        return self.m_p2

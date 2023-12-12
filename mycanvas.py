@@ -1,11 +1,12 @@
+import json
 from PyQt5 import QtOpenGL, QtCore
 from OpenGL.GL import *
+from hetool.compgeom.compgeom import CompGeom
 from hetool.he.hecontroller import HeController
 from hetool.he.hemodel import HeModel
 from hetool.geometry.segments.line import Point, Line
 from hetool.geometry.point import Point
 from hetool.compgeom.tesselation import Tesselation
-
 
 class MyCanvas(QtOpenGL.QGLWidget):
     def __init__(self):
@@ -49,7 +50,6 @@ class MyCanvas(QtOpenGL.QGLWidget):
         glLoadIdentity()
 
     def paintGL(self):
-
         if not (self.m_hmodel.isEmpty()):
             patches = self.m_hmodel.getPatches()
 
@@ -154,3 +154,32 @@ class MyCanvas(QtOpenGL.QGLWidget):
         self.m_controller.insertSegment(segment, 0.01)
         self.update()
         self.repaint()
+
+    def pointGrid(self, space):
+        self.space = space
+        if self.space > 0:
+            xmax = self.m_hmodel.getBoundBox()[1]
+            xmin = self.m_hmodel.getBoundBox()[0]
+            x_quant = int((xmax - xmin) / self.space)
+            ymax = self.m_hmodel.getBoundBox()[3]
+            ymin = self.m_hmodel.getBoundBox()[2]
+            y_quant = int((ymax - ymin) / self.space)
+            glNewList(self.list, GL_COMPILE)
+            json_data = {"points": [] }
+            for i in range(x_quant):
+                for j in range(y_quant):
+                    posx = xmin + self.space*i
+                    posy = ymin + self.space*j
+                    point = Point(posx, posy)
+                    if CompGeom.isPointInPolygon(self.m_hmodel.getPoints(), point):
+                        glColor4f(1.0, 1.0, 1.0, 1.0)
+                        glPointSize(4)
+                        glBegin(GL_POINTS)
+                        glVertex2f(point.getX(), point.getY())
+                        glEnd()
+                        json_data["points"].append([point.getX(), point.getY()])
+            glEndList()
+
+            json_object = json.dumps(json_data)
+            with open("input.json", "w") as outfile:
+                outfile.write(json_object)
