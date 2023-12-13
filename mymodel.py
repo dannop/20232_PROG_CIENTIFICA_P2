@@ -110,3 +110,11 @@ class MyModel:
                 if temp_ymax > ymax:
                     ymax = temp_ymax
         return xmin,xmax,ymin,ymax
+    
+    def clearAll(self):
+        self.m_verts = []
+        self.m_curves = []
+        self.m_connections = []
+        self.m_restrictions = []
+        self.m_forces = []
+        self.m_temperatures = []

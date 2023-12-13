@@ -204,6 +204,11 @@ class MyCanvas(QtOpenGL.QGLWidget):
         y = self.m_B + mY
         return QtCore.QPointF(x, y)
 
+    def clearData(self):
+        self.m_model.clearAll()
+        self.m_hmodel.clearAll()
+        self.update()
+
     def updateRestriction(self):
         segments = self.m_hmodel.getSegments()
         for segment in segments:
@@ -244,6 +249,7 @@ class MyCanvas(QtOpenGL.QGLWidget):
 
     def createMesh(self, space):
         if space > 0:
+
             xmax = self.m_hmodel.getBoundBox()[1]
             xmin = self.m_hmodel.getBoundBox()[0]
             x_quant = int((xmax - xmin) / space)
