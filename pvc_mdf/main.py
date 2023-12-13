@@ -37,11 +37,11 @@ def run(file_path):
     for i in range(ne_connections):
         if is_fixed[i] == 1:
             A[i, i] = 1
-            b[i] = temperatures[i]
         else:
             A[i, i] = connections[i][0]
             for j in connections[i][1:]:
                 A[i, j] = -1
+        b[i] = temperatures[i]
     
     x = np.linalg.solve(A, b)
 
