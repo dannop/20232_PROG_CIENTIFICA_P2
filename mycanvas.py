@@ -225,33 +225,35 @@ class MyCanvas(QtOpenGL.QGLWidget):
                 self.update()
 
     def runPVC(self):
-        json_data = {"connections": [], "temperatures": []}
-        for segment in self.m_hmodel.getSegments():
-            json_data["connections"].append([segment.getP1().getX(), segment.getP1().getY(), segment.getP2().getX(), segment.getP2().getY()])
-        for point in self.m_hmodel.getPoints():
-            json_data["temperatures"].append([point.getX(), point.getY()])
+        json_data = {
+            "connections": self.m_model.getCoords(), 
+            "temperatures": self.m_model.getTemperatures(),
+        }
         json_object = json.dumps(json_data)
         with open("pvc_mdf/input.json", "w") as outfile:
             outfile.write(json_object)
-        PVC.run()
+        pvc = PVC()
+        pvc.run()
 
     def runPVI(self):
-        json_data = {"coords": [], "connections": [], "restrictions": [], "forces": []}
-        for point in self.m_hmodel.getPoints():
-            json_data["coords"].append([point.getX(), point.getY()])
-        for segment in self.m_hmodel.getSegments():
-            json_data["connections"].append([segment.getP1().getX(), segment.getP1().getY(), segment.getP2().getX(), segment.getP2().getY()])
-        
+        json_data = {
+            "coords": self.m_model.getCoords(), 
+            "connections": self.m_model.getConnections(), 
+            "restrictions": self.m_model.getRestrictions(), 
+            "forces": self.m_model.getForces()
+        }
         json_object = json.dumps(json_data)
         with open("pvi_med/input.json", "w") as outfile:
             outfile.write(json_object)
-        PVI.run()
+        pvi = PVI()
+        pvi.run()
 
     def createMesh(self, space):
         if space > 0:
             xmax = self.m_hmodel.getBoundBox()[1]
             xmin = self.m_hmodel.getBoundBox()[0]
             x_quant = int((xmax - xmin) / space)
+
             ymax = self.m_hmodel.getBoundBox()[3]
             ymin = self.m_hmodel.getBoundBox()[2]
             y_quant = int((ymax - ymin) / space)
@@ -265,5 +267,78 @@ class MyCanvas(QtOpenGL.QGLWidget):
                     for pacth in patches:
                         if CompGeom.isPointInPolygon(pacth.getPoints(), point):
                             self.m_controller.insertPoint([point.getX(), point.getY()], 0.01)
-                            self.m_model.setVerts(point.getX(), point.getY())
             self.update()
+
+            points = self.m_hmodel.getPoints()
+            for i in range(len(points)):
+                self.m_model.addVert({
+                    'i': i, 
+                    'x': points[i].getX(), 
+                    'y': points[i].getY(),
+                    'force': [0, 0],
+                    'restric': 0,
+                    'temp': 0
+                })
+            self.m_model.setJSONData(space)
+
+    # def createMesh(self, space):
+    #     if space > 0:
+    #         # Quantidade de pontos em cada eixo
+    #         xmax = self.m_hmodel.getBoundBox()[1]
+    #         xmin = self.m_hmodel.getBoundBox()[0]
+    #         x_quant = int((xmax - xmin) / space)
+
+    #         ymax = self.m_hmodel.getBoundBox()[3]
+    #         ymin = self.m_hmodel.getBoundBox()[2]
+    #         y_quant = int((ymax - ymin) / space)
+            
+    #         # Gerando todos os pontos e conexões possiveis
+    #         all_points = np.zeros((x_quant*y_quant, 2))
+    #         all_connections = np.zeros((x_quant*y_quant, 5))
+    #         for i in range(x_quant):
+    #             for j in range(y_quant):
+    #                 all_points[i*y_quant + j] = [xmin + space*i, ymin + space*j]
+    #                 aux = 4-(i == x_quant-1 or i == 0)-(j == y_quant-1 or j == 0)
+    #                 aux_array = np.zeros(4)
+    #                 acc = 0
+    #                 if i > 0:
+    #                     aux_array[acc] = (i-1)*y_quant + j
+    #                     acc += 1
+    #                 if j > 0:
+    #                     aux_array[acc] = i*y_quant + j - 1
+    #                     acc += 1
+    #                 if i < x_quant-1:
+    #                     aux_array[acc] = (i+1)*y_quant + j
+    #                     acc += 1
+    #                 if j < y_quant-1:
+    #                     aux_array[acc] = i*y_quant + j + 1
+    #                 all_connections[i*y_quant + j] = [aux, aux_array[0], aux_array[1], aux_array[2], aux_array[3]]
+
+    #         # Removendo pontos e conexões que não estão dentro da area do modelo
+    #         points = []
+    #         connections = []
+    #         patches = self.m_hmodel.getPatches()
+    #         for i in range(x_quant*y_quant):
+    #             point = all_points[i]
+    #             connection = all_connections[i]
+    #             for pacth in patches:
+    #                 if CompGeom.isPointInPolygon(pacth.getPoints(), point):
+    #                     points.append(point)
+    #                     connections.append(connection)
+    #                 else:
+    #                     for j in range(i+1, x_quant*y_quant):
+    #                         for k in range(1, 5):
+    #                             if all_connections[j][k] == i:
+    #                                 all_connections[j][k] = -1
+
+    #         # Salvando e desenhando o modelo
+    #         self.m_model.clearPoints()
+    #         for point in points:
+    #             self.m_controller.insertPoint(point, 0.01)   
+    #             self.m_model.addVert(point[0], point[1])  
+
+    #         self.m_model.clearConnections()
+    #         for connection in connections:
+    #             self.m_model.addConnection(connection)
+                
+    #         self.update()
