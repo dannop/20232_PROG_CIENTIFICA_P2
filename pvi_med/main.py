@@ -5,7 +5,7 @@ import numpy as np
 class PVI():
     def __init__(self):
         super(PVI, self).__init__()
-        self.file_path = "input.json"
+        self.file_path = "pvi_med/input.json"
 
     def read_coords(self):
         with open(self.file_path, 'r') as f:
@@ -42,6 +42,7 @@ class PVI():
                 return ne_forces, x_forces, y_forces
             
     def output_res(self, key, ux, uy, vx, vy, ax, ay):
+        print(key)
         output_dict = {key: {
             "ux": ux.tolist(),
             "uy": uy.tolist(),
@@ -56,7 +57,7 @@ class PVI():
 
     def run(self):
         T = 1
-        num_steps = 100
+        num_steps = 1
         dt = T/num_steps
         
         radius = 0.1
@@ -67,14 +68,17 @@ class PVI():
         
         ne_connections, connections = self.read_connections()
         if ne_coords != ne_connections:
+            print("Error: number of coordinates and connections are different", ne_coords, ne_connections)
             return "Error: number of coordinates and connections are different"
         
         ne_restrictions, restrictions = self.read_restrictions()
         if ne_coords != ne_restrictions:
+            print("Error: number of coordinates and restrictions are different", ne_coords, ne_restrictions)
             return "Error: number of coordinates and restrictions are different"
 
         ne_forces, x_forces, y_forces = self.read_forces()
         if ne_coords != ne_forces:
+            print("Error: number of coordinates and forces are different", ne_coords, ne_forces)
             return "Error: number of coordinates and forces are different"
 
         ux = np.zeros(ne_coords)
@@ -87,6 +91,7 @@ class PVI():
         fiy = np.zeros(ne_coords)
         
         for i in range(num_steps):
+            print("PVI", i)
             ax = (x_forces - fix)/mass
             ay = (y_forces - fiy)/mass
             vx = vx + ax*dt

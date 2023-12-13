@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 class PVC():
     def __init__(self):
         super(PVC, self).__init__()
-        self.file_path = "input.json"
+        self.file_path = "pvc_mdf/input.json"
         
     def read_connections(self):
         with open(self.file_path, 'r') as f:
@@ -34,12 +34,14 @@ class PVC():
         ne_temperatures, is_fixed, temperatures = self.read_temperatures()
 
         if ne_connections != ne_temperatures:
+            print("Error: number of connections and temperatures are different", ne_connections, ne_temperatures)
             return "Error: number of connections and temperatures are different"
         
         A = np.zeros((ne_connections, ne_connections))
         b = np.zeros(ne_connections)
 
         for i in range(ne_connections):
+            print("PVC", i)
             if is_fixed[i] == 1:
                 A[i, i] = 1
             else:
