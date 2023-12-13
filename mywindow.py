@@ -12,7 +12,9 @@ class MyWindow(QMainWindow):
     self.model = MyModel()
     self.canvas = MyCanvas(self.model)
     self.setCentralWidget(self.canvas)
+    self.setActions()
     
+  def setActions(self):
     tb = self.addToolBar("File")
     delete = QAction(QIcon("icons/button_delete.png"), "Delete", self)
     tb.addAction(delete)
@@ -26,14 +28,16 @@ class MyWindow(QMainWindow):
     tb.addAction(grade)
     select = QAction(QIcon("icons/button_select.png"), "Select", self)
     tb.addAction(select)
-    pvc = QAction(QIcon("icons/button_download.png"), "Apply Force", self)
-    tb.addAction(pvc)
-    pvi = QAction(QIcon("icons/button_arrow.png"), "Apply Restriction", self)
+    pvi = QAction("PVI", self)
     tb.addAction(pvi)
-    pvc = QAction(QIcon("icons/button_termo.png"), "PVC", self)
+    force = QAction(QIcon("icons/button_download.png"), "Apply Force", self)
+    tb.addAction(force)
+    restriction = QAction(QIcon("icons/button_arrow.png"), "Apply Restriction", self)
+    tb.addAction(restriction)
+    pvc = QAction("PVC", self)
     tb.addAction(pvc)
-    pvi = QAction(QIcon("icons/button_task.png"), "PVI", self)
-    tb.addAction(pvi)
+    temperature = QAction(QIcon("icons/button_termo.png"), "Apply Temperature", self)
+    tb.addAction(temperature)
     tb.actionTriggered[QAction].connect(self.tbpressed)
 
   def tbpressed(self, action):
@@ -52,13 +56,13 @@ class MyWindow(QMainWindow):
         self.canvas.createMesh(int(value))
     elif action.text() == "Select":
       self.canvas.setState("Select")
+    elif action.text() == "PVI":
+      self.canvas.runPVI()
     elif action.text() == "Apply Force":
       self.canvas.updateForce()
     elif action.text() == "Apply Restriction":
       self.canvas.updateRestriction()
     elif action.text() == "PVC":
-      action.undo()
-      self.canvas.update()
-    elif action.text() == "PVI":
-      action.redo()
-      self.canvas.update()
+      self.canvas.runPVC()
+    elif action.text() == "Apply Temperature":
+      self.canvas.updateRestriction()

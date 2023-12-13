@@ -8,7 +8,8 @@ from hetool.geometry.segments.line import Point
 from hetool.geometry.point import Point
 from hetool.compgeom.tesselation import Tesselation
 from mycollector import *
-
+from pvc_mdf.main import PVC
+from pvi_med.main import PVI
 class MyCanvas(QtOpenGL.QGLWidget):
     def __init__(self, m_model):
         super(MyCanvas, self).__init__()
@@ -224,32 +225,30 @@ class MyCanvas(QtOpenGL.QGLWidget):
                 self.update()
 
     def runPVC(self):
-        pvc_json_data = {"connections": [], "temperatures": []}
+        json_data = {"connections": [], "temperatures": []}
         for segment in self.m_hmodel.getSegments():
-            if segment.isSelected():
-                pvc_json_data["connections"].append([segment.getP1().getX(), segment.getP1().getY(), segment.getP2().getX(), segment.getP2().getY()])
+            json_data["connections"].append([segment.getP1().getX(), segment.getP1().getY(), segment.getP2().getX(), segment.getP2().getY()])
         for point in self.m_hmodel.getPoints():
-            if point.isSelected():
-                pvc_json_data["temperatures"].append([point.getX(), point.getY()])
-        pvc_json_object = json.dumps(pvc_json_data)
+            json_data["temperatures"].append([point.getX(), point.getY()])
+        json_object = json.dumps(json_data)
         with open("pvc_mdf/input.json", "w") as outfile:
-            outfile.write(pvc_json_object)
-    
+            outfile.write(json_object)
+        PVC.run()
+
     def runPVI(self):
         json_data = {"coords": [], "connections": [], "restrictions": [], "forces": []}
-        for segment in self.m_hmodel.getSegments():
-            if segment.isSelected():
-                json_data["connections"].append([segment.getP1().getX(), segment.getP1().getY(), segment.getP2().getX(), segment.getP2().getY()])
         for point in self.m_hmodel.getPoints():
-            if point.isSelected():
-                json_data["coords"].append([point.getX(), point.getY()])
+            json_data["coords"].append([point.getX(), point.getY()])
+        for segment in self.m_hmodel.getSegments():
+            json_data["connections"].append([segment.getP1().getX(), segment.getP1().getY(), segment.getP2().getX(), segment.getP2().getY()])
+        
         json_object = json.dumps(json_data)
         with open("pvi_med/input.json", "w") as outfile:
             outfile.write(json_object)
+        PVI.run()
 
     def createMesh(self, space):
         if space > 0:
-
             xmax = self.m_hmodel.getBoundBox()[1]
             xmin = self.m_hmodel.getBoundBox()[0]
             x_quant = int((xmax - xmin) / space)
