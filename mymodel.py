@@ -153,14 +153,19 @@ class MyModel:
             
             if count > 0:
                 self.m_coords.append([vert['x'], vert['y']])
-                self.m_connections.append([count, i_left, i_right, i_up, i_down])
+                values = [count, i_left, i_right, i_up, i_down]
+                # Jogando todos os zeros pro final
+                values.sort(key=lambda n:n==0)
+                self.m_connections.append(values)
                 self.m_temperatures.append([vert['temp'], vert['temp']])
-                if i < 3:
-                    self.m_forces.append([1000, vert['force'][1]])
-                else:
-                    self.m_forces.append([vert['force'][0], vert['force'][1]])
+                self.m_forces.append([vert['force'][0], vert['force'][1]])
+                self.m_restrictions.append([vert['restric'], vert['restric']])
+                # if i < 3:
+                #     self.m_forces.append([1000, vert['force'][1]])
+                # else:
+                #     self.m_forces.append([vert['force'][0], vert['force'][1]])
                 
-                if i > (len(self.m_verts) -3):
-                    self.m_restrictions.append([1, 1])
-                else:
-                    self.m_restrictions.append([vert['restric'], vert['restric']])
+                # if i > (len(self.m_verts) -3):
+                #     self.m_restrictions.append([1, 1])
+                # else:
+                #     self.m_restrictions.append([vert['restric'], vert['restric']])
