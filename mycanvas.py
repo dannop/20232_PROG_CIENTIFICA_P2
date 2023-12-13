@@ -27,14 +27,10 @@ class MyCanvas(QtOpenGL.QGLWidget):
 
         self.m_hmodel = HeModel()
         self.m_controller = HeController(self.m_hmodel)
-        
-        self.list = None
-        self.space = 0 
 
     def initializeGL(self):
         glClear(GL_COLOR_BUFFER_BIT)
-        self.list = glGenLists(1)
-
+        
     def resizeGL(self, _width, _height):
         self.m_w = _width
         self.m_h = _height
@@ -62,7 +58,7 @@ class MyCanvas(QtOpenGL.QGLWidget):
             elif patch.isSelected():
                 glColor3f(1.00, 0.75, 0.75)
             else:
-                glColor3f(1.0, 0.0, 1.0)
+                glColor3f(0.75, 0.75, 0.75)
             
             triangs = Tesselation.tessellate(patch.getPoints())
             for triangle in triangs:
@@ -76,6 +72,10 @@ class MyCanvas(QtOpenGL.QGLWidget):
             points = segment.getPointsToDraw()
             if segment.isSelected():
                 glColor3f(1.0, 0.0, 0.0)
+            elif segment == self.m_model.getRestrictions():
+                glColor(0.5, 0,6, 1.0)
+            elif segment == self.m_model.getForces():
+                glColor(1.0, 0.7, 0.5)
             else:
                 glColor(0.0, 1.0, 1.0)
             
@@ -112,7 +112,6 @@ class MyCanvas(QtOpenGL.QGLWidget):
         self.m_L, self.m_R, self.m_B, self.m_T = self.m_model.getBoundBox()
         self.scaleWorldWindow(1.1)
         self.update()
-        self.pointGrid(self.space)
 
     def scaleWorldWindow(self, _scaleFactor):
         cx = 0.5*(self.m_L + self.m_R)
@@ -156,7 +155,6 @@ class MyCanvas(QtOpenGL.QGLWidget):
         if self.m_collector.isActive():
             point = self.convertPtCoordsToUniverse(point)
             self.m_collector.update(point.x(), point.y())
-            self.pointGrid(self.space)
             self.update()
 
     def mouseReleaseEvent(self, event):
@@ -183,7 +181,6 @@ class MyCanvas(QtOpenGL.QGLWidget):
                 self.m_controller.insertSegment(heSegment, 0.01)
                 self.update()
                 self.repaint()
-                self.pointGrid(self.space)
             else:
                 self.setMouseTracking(True)
 
@@ -206,7 +203,21 @@ class MyCanvas(QtOpenGL.QGLWidget):
         x = self.m_L + mX
         y = self.m_B + mY
         return QtCore.QPointF(x, y)
-    
+
+    def updateRestriction(self):
+        segments = self.m_hmodel.getSegments()
+        for segment in segments:
+            if segment.isSelected():
+                self.m_model.setRestrictions(segment)
+                self.update()
+
+    def updateForce(self):
+        segments = self.m_hmodel.getSegments()
+        for segment in segments:
+            if segment.isSelected():
+                self.m_model.setForces(segment)
+                self.update()
+
     def runPVC(self):
         pvc_json_data = {"connections": [], "temperatures": []}
         for segment in self.m_hmodel.getSegments():
@@ -231,32 +242,23 @@ class MyCanvas(QtOpenGL.QGLWidget):
         with open("pvi_med/input.json", "w") as outfile:
             outfile.write(json_object)
 
-    def pointGrid(self, space):
-        print('pointGrid')
-        self.space = space
-        if self.space > 0:
+    def createMesh(self, space):
+        if space > 0:
             xmax = self.m_hmodel.getBoundBox()[1]
             xmin = self.m_hmodel.getBoundBox()[0]
-            x_quant = int((xmax - xmin) / self.space)
+            x_quant = int((xmax - xmin) / space)
             ymax = self.m_hmodel.getBoundBox()[3]
             ymin = self.m_hmodel.getBoundBox()[2]
-            y_quant = int((ymax - ymin) / self.space)
+            y_quant = int((ymax - ymin) / space)
 
-            glNewList(self.list, GL_COMPILE)
             for i in range(x_quant):
                 for j in range(y_quant):
-                    posx = xmin + self.space*i
-                    posy = ymin + self.space*j
+                    posx = xmin + space*i
+                    posy = ymin + space*j
                     point = Point(posx, posy)
                     patches = self.m_hmodel.getPatches()
                     for pacth in patches:
                         if CompGeom.isPointInPolygon(pacth.getPoints(), point):
-                            print('if CompGeom.isPointInPolygon(pacth.getPoints(), point):')
-                            print(point.getX(), point.getY())
-                            glColor4f(1.0, 1.0, 1.0, 1.0)
-                            glPointSize(4)
-                            glBegin(GL_POINTS)
-                            glVertex2f(point.getX(), point.getY())
-                            glEnd()
+                            self.m_controller.insertPoint([point.getX(), point.getY()], 0.01)
                             self.m_model.setVerts(point.getX(), point.getY())
-            glEndList()
+            self.update()
