@@ -100,8 +100,11 @@ def run(file_path):
 
             x = x_coords[j]+ux[j]
             y = y_coords[j]+uy[j]
-
-            for k in connections[j]:
+            
+            for k in connections[j][1:]:
+                if k == 0:
+                    continue
+                k = k-1
                 xk = x_coords[k]+ux[k]
                 yk = y_coords[k]+uy[k]
                 dx = xk-x

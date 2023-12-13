@@ -40,6 +40,9 @@ def run(file_path):
         else:
             A[i, i] = connections[i][0]
             for j in connections[i][1:]:
+                if j == 0:
+                    continue
+                j -= 1
                 A[i, j] = -1
         b[i] = temperatures[i]
     
