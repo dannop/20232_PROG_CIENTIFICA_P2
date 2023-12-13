@@ -26,6 +26,10 @@ class MyWindow(QMainWindow):
     tb.addAction(select)
     delete = QAction(QIcon("icons/button_delete.png"), "Delete", self)
     tb.addAction(delete)
+    pvc = QAction(QIcon("icons/button_download.png"), "Apply Force", self)
+    tb.addAction(pvc)
+    pvi = QAction(QIcon("icons/button_arrow.png"), "Apply Restriction", self)
+    tb.addAction(pvi)
     pvc = QAction(QIcon("icons/button_termo.png"), "PVC", self)
     tb.addAction(pvc)
     pvi = QAction(QIcon("icons/button_task.png"), "PVI", self)
@@ -47,21 +51,25 @@ class MyWindow(QMainWindow):
     if action.text() == "Set Mesh":
       value, valid = QInputDialog.getInt(self, 'Mesh', 'Digite o espaço entre os pontos:')
       if valid:
-        self.canvas.pointGrid(int(value))
+        self.canvas.createMesh(int(value))
     elif action.text() == "Select":
       self.canvas.setState("Select")
     elif action.text() == "Delete":
       action.delSelectedEntities()
       self.canvas.update()
-    elif action.text() == "Undo":
-      action.undo()
-      self.canvas.update()
-    elif action.text() == "Redo":
-      action.redo()
-      self.canvas.update()
+    elif action.text() == "Apply Force":
+      self.canvas.updateForce()
+    elif action.text() == "Apply Restriction":
+      self.canvas.updateRestriction()
     elif action.text() == "PVC":
       action.undo()
       self.canvas.update()
     elif action.text() == "PVI":
+      action.redo()
+      self.canvas.update()
+    elif action.text() == "Undo":
+      action.undo()
+      self.canvas.update()
+    elif action.text() == "Redo":
       action.redo()
       self.canvas.update()

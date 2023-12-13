@@ -54,9 +54,21 @@ class MyModel:
     def setCurve(self,_x1,_y1,_x2,_y2):
         self.m_curves.append(MyCurve(MyPoint(_x1,_y1),MyPoint(_x2,_y2)))
 
-    def getCurves(self):
-        return self.m_curves
+    def getRestrictions(self):
+        return self.m_restrictions
 
+    def setRestrictions(self, m_restrictions):
+        self.m_restrictions = m_restrictions
+
+    def getForces(self):
+        return self.m_forces
+
+    def setForces(self, m_forces):
+        self.m_forces = m_forces
+
+    def getVerts(self):
+        return self.m_verts
+    
     def isEmpty(self):
         return (len(self.m_verts) == 0) and (len(self.m_curves) == 0)
     
