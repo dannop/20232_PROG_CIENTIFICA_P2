@@ -32,7 +32,7 @@ class MyWindow(QMainWindow):
     tb.addAction(pvi)
     force = QAction(QIcon("icons/button_download.png"), "Apply Force", self)
     tb.addAction(force)
-    restriction = QAction(QIcon("icons/button_arrow.png"), "Apply Restriction", self)
+    restriction = QAction(QIcon("icons/button_disable.png"), "Apply Restriction", self)
     tb.addAction(restriction)
     pvc = QAction("PVC", self)
     tb.addAction(pvc)
@@ -59,10 +59,10 @@ class MyWindow(QMainWindow):
     elif action.text() == "PVI":
       self.canvas.runPVI()
     elif action.text() == "Apply Force":
-      self.canvas.updateForce()
+      self.canvas.updatePointTags('force', [1000, 0], [0, 0])
     elif action.text() == "Apply Restriction":
-      self.canvas.updateRestriction()
+      self.canvas.updatePointTags('restric', 1, 0)
     elif action.text() == "PVC":
       self.canvas.runPVC()
     elif action.text() == "Apply Temperature":
-      self.canvas.updateRestriction()
+      self.canvas.updatePointTags('temp', 1, 0)

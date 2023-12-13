@@ -70,16 +70,12 @@ class MyCanvas(QtOpenGL.QGLWidget):
 
         segments = self.m_hmodel.getSegments()
         for segment in segments:
-            points = segment.getPointsToDraw()
             if segment.isSelected():
                 glColor3f(1.0, 0.0, 0.0)
-            elif segment == self.m_model.getRestrictions():
-                glColor(0.5, 0,6, 1.0)
-            elif segment == self.m_model.getForces():
-                glColor(1.0, 0.7, 0.5)
             else:
                 glColor(0.0, 1.0, 1.0)
             
+            points = segment.getPointsToDraw()
             glBegin(GL_LINE_STRIP)
             for point in points:
                 glVertex2f(point.getX(), point.getY())
@@ -90,7 +86,19 @@ class MyCanvas(QtOpenGL.QGLWidget):
             if point.isSelected():
                 glColor3f(1.00, 0.75, 0.75)
             else:
-                glColor3f(1.0, 0.0, 1.0)
+                for vert in self.m_model.getVerts():
+                    if vert['x'] == point.getX() and vert['y'] == point.getY():
+                        if vert['force'] != [0, 0]:
+                            glColor3f(0.0, 1.0, 0.5)
+                        elif vert['restric'] == 1:
+                            glColor3f(0.0, 0.0, 0.0)
+                        elif vert['temp'] == 1:
+                            glColor3f(1.0, 0.0, 0.0)
+                        else:
+                            glColor3f(0.7, 0.0, 1.0)
+                        break
+                    else:
+                        glColor3f(0.7, 0.0, 1.0)
 
             glPointSize(3)
             glBegin(GL_POINTS)
@@ -223,6 +231,15 @@ class MyCanvas(QtOpenGL.QGLWidget):
             if segment.isSelected():
                 self.m_model.setForces(segment)
                 self.update()
+    
+    def updatePointTags(self, kind, if_value, else_value):
+        points = self.m_hmodel.getPoints()
+        for point in points:
+            if point.isSelected():
+                for vert in self.m_model.getVerts():
+                    if vert['x'] == point.getX() and vert['y'] == point.getY():
+                        vert[kind] = if_value if vert[kind] == else_value else else_value
+                        break
 
     def runPVC(self):
         json_data = {
