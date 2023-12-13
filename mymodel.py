@@ -40,7 +40,10 @@ class MyModel:
     def __init__(self):
         self.m_verts = []
         self.m_curves = []
-        self.m_quadratic_beziers = []
+        self.m_connections = []
+        self.m_restrictions = []
+        self.m_forces = []
+        self.m_temperatures = []
 
     def setVerts(self,_x,_y):
         self.m_verts.append(MyPoint(_x,_y))
