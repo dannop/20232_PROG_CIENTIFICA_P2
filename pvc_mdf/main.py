@@ -30,6 +30,8 @@ class PVC():
             json.dump(output_dict, f)
         plt.plot(x, marker='o')
         plt.title('PVC')
+        plt.xlabel('Coordenada')
+        plt.ylabel('Temperatura')
         plt.grid(True)
         plt.show()
 
