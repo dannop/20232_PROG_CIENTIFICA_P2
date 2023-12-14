@@ -90,9 +90,9 @@ class MyCanvas(QtOpenGL.QGLWidget):
                     if vert['x'] == point.getX() and vert['y'] == point.getY():
                         if vert['force'] != [0, 0]:
                             glColor3f(0.0, 1.0, 0.5)
-                        elif vert['restric'] == 1:
+                        elif vert['restric'] != [0, 0]:
                             glColor3f(0.0, 0.0, 0.0)
-                        elif vert['temp'] == 1:
+                        elif vert['temp'] != [0, 0]:
                             glColor3f(1.0, 0.0, 0.0)
                         else:
                             glColor3f(0.7, 0.0, 1.0)
@@ -217,20 +217,6 @@ class MyCanvas(QtOpenGL.QGLWidget):
         self.m_model.clearAll()
         self.m_hmodel.clearAll()
         self.update()
-
-    def updateRestriction(self):
-        segments = self.m_hmodel.getSegments()
-        for segment in segments:
-            if segment.isSelected():
-                self.m_model.setRestrictions(segment)
-                self.update()
-
-    def updateForce(self):
-        segments = self.m_hmodel.getSegments()
-        for segment in segments:
-            if segment.isSelected():
-                self.m_model.setForces(segment)
-                self.update()
     
     def updatePointTags(self, kind, if_value, else_value):
         points = self.m_hmodel.getPoints()
@@ -243,7 +229,7 @@ class MyCanvas(QtOpenGL.QGLWidget):
 
     def runPVC(self):
         json_data = {
-            "connections": self.m_model.getCoords(), 
+            "connections": self.m_model.getConnections(), 
             "temperatures": self.m_model.getTemperatures(),
         }
         json_object = json.dumps(json_data)
@@ -295,8 +281,8 @@ class MyCanvas(QtOpenGL.QGLWidget):
                     'x': point.getX(), 
                     'y': point.getY(),
                     'force': [0, 0],
-                    'restric': 0,
-                    'temp': 0
+                    'restric': [0, 0],
+                    'temp': [0, 0]
                 })
             self.m_model.setJSONData(space)
 

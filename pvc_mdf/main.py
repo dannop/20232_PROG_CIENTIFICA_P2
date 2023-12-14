@@ -24,10 +24,12 @@ class PVC():
                 temperatures = np.array([float(point[1]) for point in data['temperatures']])
                 return ne_temperatures, is_fixed, temperatures
 
-    def output_res(self, result):
-        output_dict = {"result": result}
-        with open("output.json", "w") as f:
+    def output_res(self, x):
+        output_dict = {"result": {"x": x.tolist()}}
+        with open("pvc_mdf/output.json", "w") as f:
             json.dump(output_dict, f)
+        plt.plot(x)
+        plt.show()
 
     def run(self):
         ne_connections, connections = self.read_connections()
@@ -41,20 +43,17 @@ class PVC():
         b = np.zeros(ne_connections)
 
         for i in range(ne_connections):
-            print("PVC", i)
             if is_fixed[i] == 1:
                 A[i, i] = 1
             else:
                 A[i, i] = connections[i][0]
-                for j in connections[i][1:]:
-                    if j == 0:
+                for j in range(4):
+                    id = int(connections[i][j+1])
+                    if id == 0:
                         continue
-                    j -= 1
-                    A[i, j] = -1
+                    A[i, id-1] = -1
             b[i] = temperatures[i]
         
         x = np.linalg.solve(A, b)
-
-        self.output_res({"x": x.tolist()})
-        plt.plot(x)
-        plt.show()
+        self.output_res(x)
+        

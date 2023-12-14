@@ -36,7 +36,9 @@ class MyWindow(QMainWindow):
     tb.addAction(restriction)
     pvc = QAction("PVC", self)
     tb.addAction(pvc)
-    temperature = QAction(QIcon("icons/button_termo.png"), "Apply Temperature", self)
+    temperature = QAction(QIcon("icons/button_termo.png"), "Apply Temperature 100", self)
+    tb.addAction(temperature)
+    temperature = QAction(QIcon("icons/button_termo.png"), "Apply Temperature 50", self)
     tb.addAction(temperature)
     tb.actionTriggered[QAction].connect(self.tbpressed)
 
@@ -65,8 +67,10 @@ class MyWindow(QMainWindow):
       # [0, -1000] forca pra baixo
       self.canvas.updatePointTags('force', [1000, 0], [0, 0])
     elif action.text() == "Apply Restriction":
-      self.canvas.updatePointTags('restric', 1, 0)
+      self.canvas.updatePointTags('restric', [1, 1], [0, 0])
     elif action.text() == "PVC":
       self.canvas.runPVC()
-    elif action.text() == "Apply Temperature":
-      self.canvas.updatePointTags('temp', 1, 0)
+    elif action.text() == "Apply Temperature 100":
+      self.canvas.updatePointTags('temp', [1, 100], [0, 0])
+    elif action.text() == "Apply Temperature 50":
+      self.canvas.updatePointTags('temp', [1, 50], [0, 0])

@@ -124,6 +124,7 @@ class MyModel:
         self.m_temperatures = []
         for i in range(len(self.m_verts)):
             vert = self.m_verts[i]
+            print(vert)
             count = 0
             i_left = 0
             i_right = 0
@@ -154,16 +155,6 @@ class MyModel:
                 # Jogando todos os zeros pro final
                 values.sort(key=lambda n:n==0)
                 self.m_connections.append(values)
-                self.m_temperatures.append([vert['temp'], vert['temp']])
-                self.m_forces.append([vert['force'][0], vert['force'][1]])
-                self.m_restrictions.append([vert['restric'], vert['restric']])
-
-                # if i < 3:
-                #     self.m_forces.append([1000, vert['force'][1]])
-                # else:
-                #     self.m_forces.append([vert['force'][0], vert['force'][1]])
-                
-                # if i > (len(self.m_verts) -3):
-                #     self.m_restrictions.append([1, 1])
-                # else:
-                #     self.m_restrictions.append([vert['restric'], vert['restric']])
+                self.m_temperatures.append(vert['temp'])
+                self.m_forces.append(vert['force'])
+                self.m_restrictions.append(vert['restric'])
