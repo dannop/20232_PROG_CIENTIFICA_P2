@@ -62,7 +62,7 @@ class PVI():
         num_steps = 1000
         dt = T/num_steps
         
-        radius = 0.1
+        radius = 1.5
         mass = 1
         kf = 1
 
