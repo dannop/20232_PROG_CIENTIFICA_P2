@@ -53,12 +53,16 @@ class MyWindow(QMainWindow):
     elif action.text() == "Set Mesh":
       value, valid = QInputDialog.getInt(self, 'Mesh', 'Digite o espaço entre os pontos:')
       if valid:
-        self.canvas.createMesh(int(value))
+        self.canvas.createMesh(float(value))
     elif action.text() == "Select":
       self.canvas.setState("Select")
     elif action.text() == "PVI":
       self.canvas.runPVI()
     elif action.text() == "Apply Force":
+      # [1000, 0] forca pra direita
+      # [-1000, 0] forca pra esquerda
+      # [0, 1000] forca pra cima 
+      # [0, -1000] forca pra baixo
       self.canvas.updatePointTags('force', [1000, 0], [0, 0])
     elif action.text() == "Apply Restriction":
       self.canvas.updatePointTags('restric', 1, 0)

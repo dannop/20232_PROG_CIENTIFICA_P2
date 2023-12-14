@@ -71,7 +71,7 @@ class MyCanvas(QtOpenGL.QGLWidget):
         segments = self.m_hmodel.getSegments()
         for segment in segments:
             if segment.isSelected():
-                glColor3f(1.0, 0.0, 0.0)
+                glColor3f(1.00, 0.75, 0.75)
             else:
                 glColor(0.0, 1.0, 1.0)
             
@@ -275,6 +275,7 @@ class MyCanvas(QtOpenGL.QGLWidget):
             ymin = self.m_hmodel.getBoundBox()[2]
             y_quant = int((ymax - ymin) / space)
 
+            points = []
             for i in range(x_quant):
                 for j in range(y_quant):
                     posx = xmin + space*i
@@ -284,14 +285,15 @@ class MyCanvas(QtOpenGL.QGLWidget):
                     for pacth in patches:
                         if CompGeom.isPointInPolygon(pacth.getPoints(), point):
                             self.m_controller.insertPoint([point.getX(), point.getY()], 0.01)
+                            points.append(point)
             self.update()
 
-            points = self.m_hmodel.getPoints()
             for i in range(len(points)):
+                point = points[i]
                 self.m_model.addVert({
-                    'i': i, 
-                    'x': points[i].getX(), 
-                    'y': points[i].getY(),
+                    'i': i+1, 
+                    'x': point.getX(), 
+                    'y': point.getY(),
                     'force': [0, 0],
                     'restric': 0,
                     'temp': 0

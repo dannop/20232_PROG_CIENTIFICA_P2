@@ -51,14 +51,11 @@ class MyModel:
     def getVerts(self):
         return self.m_verts
 
-    def clearVerts(self):
-        self.m_verts = []
-
-    def clearConnections(self):
-        self.m_connections = []
+    # def clearConnections(self):
+    #     self.m_connections = []
         
-    def addConnection(self, _connection):
-        self.m_connections.append(_connection)
+    # def addConnection(self, _connection):
+    #     self.m_connections.append(_connection)
 
     def getConnections(self):
         return self.m_connections
@@ -160,6 +157,7 @@ class MyModel:
                 self.m_temperatures.append([vert['temp'], vert['temp']])
                 self.m_forces.append([vert['force'][0], vert['force'][1]])
                 self.m_restrictions.append([vert['restric'], vert['restric']])
+
                 # if i < 3:
                 #     self.m_forces.append([1000, vert['force'][1]])
                 # else:
