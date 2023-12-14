@@ -30,15 +30,21 @@ class MyWindow(QMainWindow):
     tb.addAction(select)
     pvi = QAction("PVI", self)
     tb.addAction(pvi)
-    force = QAction(QIcon("icons/button_download.png"), "Apply Force", self)
-    tb.addAction(force)
     restriction = QAction(QIcon("icons/button_disable.png"), "Apply Restriction", self)
     tb.addAction(restriction)
+    left_force = QAction(QIcon("icons/button_arrow_left.png"), "Apply Left Force", self)
+    tb.addAction(left_force)
+    right_force = QAction(QIcon("icons/button_arrow_right.png"), "Apply Right Force", self)
+    tb.addAction(right_force)
+    up_force = QAction(QIcon("icons/button_arrow_up.png"), "Apply Up Force", self)
+    tb.addAction(up_force)
+    down_force = QAction(QIcon("icons/button_arrow_down.png"), "Apply Down Force", self)
+    tb.addAction(down_force)
     pvc = QAction("PVC", self)
     tb.addAction(pvc)
-    temperature = QAction(QIcon("icons/button_termo.png"), "Apply Temperature 100", self)
+    temperature = QAction(QIcon("icons/button_termo1.png"), "Apply Temperature 100", self)
     tb.addAction(temperature)
-    temperature = QAction(QIcon("icons/button_termo.png"), "Apply Temperature 50", self)
+    temperature = QAction(QIcon("icons/button_termo2.png"), "Apply Temperature 50", self)
     tb.addAction(temperature)
     tb.actionTriggered[QAction].connect(self.tbpressed)
 
@@ -60,14 +66,16 @@ class MyWindow(QMainWindow):
       self.canvas.setState("Select")
     elif action.text() == "PVI":
       self.canvas.runPVI()
-    elif action.text() == "Apply Force":
-      # [1000, 0] forca pra direita
-      # [-1000, 0] forca pra esquerda
-      # [0, 1000] forca pra cima 
-      # [0, -1000] forca pra baixo
-      self.canvas.updatePointTags('force', [1000, 0], [0, 0])
     elif action.text() == "Apply Restriction":
       self.canvas.updatePointTags('restric', [1, 1], [0, 0])
+    elif action.text() == "Apply Left Force":
+      self.canvas.updatePointTags('force', [1000, 0], [0, 0])
+    elif action.text() == "Apply Right Force":
+      self.canvas.updatePointTags('force', [-1000, 0], [0, 0])
+    elif action.text() == "Apply Up Force":
+      self.canvas.updatePointTags('force', [0, 1000], [0, 0])
+    elif action.text() == "Apply Down Force":
+      self.canvas.updatePointTags('force', [0, -1000], [0, 0])
     elif action.text() == "PVC":
       self.canvas.runPVC()
     elif action.text() == "Apply Temperature 100":
