@@ -51,12 +51,6 @@ class MyModel:
     def getVerts(self):
         return self.m_verts
 
-    # def clearConnections(self):
-    #     self.m_connections = []
-        
-    # def addConnection(self, _connection):
-    #     self.m_connections.append(_connection)
-
     def getConnections(self):
         return self.m_connections
     
