@@ -1,6 +1,6 @@
 import json
 import numpy as np
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 class PVI():
     def __init__(self):
@@ -41,23 +41,16 @@ class PVI():
                 y_forces = np.array([float(point[1]) for point in data['forces']])
                 return ne_forces, x_forces, y_forces
             
-    def output_res(self, key, ux, uy, vx, vy, ax, ay):
-        print(key)
-        output_dict = {key: {
-            "ux": ux.tolist(),
-            "uy": uy.tolist(),
-            "vx": vx.tolist(),
-            "vy": vy.tolist(),
-            "ax": ax.tolist(),
-            "ay": ay.tolist()
-        }}
-        
-        with open("output.json", "w") as f:
+    def output_res(self, results):
+        output_dict = {'results': results}
+        with open("pvi_med/output.json", "w") as f:
             json.dump(output_dict, f)
+        plt.plot(results)
+        plt.show()
 
     def run(self):
         T = 1
-        num_steps = 1
+        num_steps = 1000
         dt = T/num_steps
         
         radius = 0.1
@@ -90,8 +83,8 @@ class PVI():
         fix = np.zeros(ne_coords)
         fiy = np.zeros(ne_coords)
         
+        results = []
         for i in range(num_steps):
-            print("PVI", i)
             ax = (x_forces - fix)/mass
             ay = (y_forces - fiy)/mass
             vx = vx + ax*dt
@@ -125,5 +118,5 @@ class PVI():
                     dy = dy * dc/dl
                     fix[j] = fix[j] + dx * kf
                     fiy[j] = fiy[j] + dy * kf
-                    
-            self.output_res("Result_"+str(i), ux, uy, vx, vy, ax, ay)
+            results.append({'ux': ux.tolist(), 'uy': uy.tolist(), 'vx': vx.tolist(), 'vy': vy.tolist(), 'ax': ax.tolist(), 'ay': ay.tolist()})        
+        self.output_res(results)
