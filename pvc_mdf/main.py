@@ -28,7 +28,9 @@ class PVC():
         output_dict = {"result": {"x": x.tolist()}}
         with open("pvc_mdf/output.json", "w") as f:
             json.dump(output_dict, f)
-        plt.plot(x)
+        plt.plot(x, marker='o')
+        plt.title('PVC')
+        plt.grid(True)
         plt.show()
 
     def run(self):

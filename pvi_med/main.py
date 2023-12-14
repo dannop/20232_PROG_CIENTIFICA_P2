@@ -45,7 +45,16 @@ class PVI():
         output_dict = {'results': results}
         with open("pvi_med/output.json", "w") as f:
             json.dump(output_dict, f)
-        plt.plot(results)
+        
+        # Selecionando os dados para o gráfico (vamos usar 'ux' como exemplo)
+        positions = [element["ux"][11] for element in output_dict["results"]]
+
+        # Criando o gráfico
+        plt.plot(positions, marker='o')
+        plt.title('PVI: Posição 12 ao Longo do Tempo')
+        plt.xlabel('Tempo')
+        plt.ylabel('Posição no Eixo X')
+        plt.grid(True)
         plt.show()
 
     def run(self):
