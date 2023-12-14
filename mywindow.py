@@ -80,5 +80,7 @@ class MyWindow(QMainWindow):
       self.canvas.runPVC()
     elif action.text() == "Apply Temperature 100":
       self.canvas.updatePointTags('temp', [1, 100], [0, 0])
-    elif action.text() == "Apply Temperature 50":
-      self.canvas.updatePointTags('temp', [1, 50], [0, 0])
+    elif action.text() == "Apply Temperature":
+      value, valid = QInputDialog.getInt(self, 'Mesh', 'Digite o espaço entre os pontos:')
+      if valid:
+        self.canvas.updatePointTags('temp', [1, value], [0, 0])
