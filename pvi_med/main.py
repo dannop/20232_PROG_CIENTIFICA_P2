@@ -47,13 +47,13 @@ class PVI():
             json.dump(output_dict, f)
         
         # Selecionando os dados para o gráfico (vamos usar 'ux' como exemplo)
-        positions = [element["ux"][11] for element in output_dict["results"]]
+        positions = [[element["ux"][11], element["uy"][11]] for element in output_dict["results"]]
 
         # Criando o gráfico
         plt.plot(positions, marker='o')
-        plt.title('PVI: Posição 12 ao Longo do Tempo')
+        plt.title('PVI: Deslocamento da Posição 12 ao Longo do Tempo')
         plt.xlabel('Tempo')
-        plt.ylabel('Posição no Eixo X')
+        plt.ylabel('Deslocamento')
         plt.grid(True)
         plt.show()
 
@@ -62,6 +62,7 @@ class PVI():
         num_steps = 1000
         dt = T/num_steps
         
+        # 1.5 definido de acordo com o tamanho 3 do ponto na Mesh
         radius = 1.5
         mass = 1
         kf = 1
