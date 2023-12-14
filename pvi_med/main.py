@@ -89,8 +89,8 @@ class PVI():
             ay = (y_forces - fiy)/mass
             vx = vx + ax*dt
             vy = vy + ay*dt
-            ux = ux + vx*dt + ax*dt*dt/2
-            uy = uy + vy*dt + ay*dt*dt/2
+            ux = ux + vx*dt 
+            uy = uy + vy*dt 
 
             fix = np.zeros(ne_coords)
             fiy = np.zeros(ne_coords)
